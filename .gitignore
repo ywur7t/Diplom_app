@@ -1,0 +1,38 @@
+# Игнорировать папку виртуального окружения Python
+venv/
+.env/
+.venv/
+
+# Игнорировать папку с изображениями и результатами
+images/
+*.png
+*.jpg
+*.jpeg
+*.bmp
+*.gif
+
+# Игнорировать файлы
+keypoints_cloud.ply
+output_mesh.ply
+
+
+
+# Игнорировать кэш Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Игнорировать файлы IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Игнорировать логи и временные файлы
+*.log
+*.tmp
+*.bak
+
+# Игнорировать системные файлы
+.DS_Store
+Thumbs.db

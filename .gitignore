@@ -15,8 +15,6 @@ images/
 keypoints_cloud.ply
 output_mesh.ply
 
-
-
 # Игнорировать кэш Python
 __pycache__/
 *.py[cod]

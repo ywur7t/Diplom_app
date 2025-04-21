@@ -18,6 +18,6 @@ def save_keypoints_as_pointcloud(points_with_depth, filename='keypoints_cloud.pl
         f.write('property float z\n')
         f.write('end_header\n')
         for x, y, z in points_with_depth:
-            z = z*1000
+            # if z < 1000:
             f.write(f'{x} {y} {z}\n')
 

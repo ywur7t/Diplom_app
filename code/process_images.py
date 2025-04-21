@@ -128,3 +128,40 @@ def DepthMap_Images(image_paths: list) -> list:
     return avg_disp, save_path
 
 
+
+
+def sobel_combined_magnitude(img):
+    sobel_x = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=5)
+    sobel_y = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=5)
+
+    # Вычисляем магнитуду градиента
+    magnitude = np.sqrt(sobel_x**2 + sobel_y**2)
+    magnitude = np.uint8(magnitude)  # Конвертируем в 8-битное изображение
+
+    return magnitude
+
+
+def extract_edges(image_paths: list) -> list:
+    edges_paths = []
+    output_dir = "images/edges"
+    os.makedirs(output_dir, exist_ok=True)
+
+    for path in image_paths:
+        img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)  # Исправлено: было cv2.imread(img, ...)
+        if img is not None:
+            combined = sobel_combined_magnitude(img)
+            # sobel_horizontal = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=5)
+            # sobel_vertical = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=5)
+
+            # Создаем пути для сохранения
+            base_name = os.path.basename(path)
+            filepath = os.path.join(output_dir, "combined_" + base_name)
+
+            # Сохраняем изображения
+            cv2.imwrite(filepath, combined)
+
+            # Добавляем пару путей в результат
+            edges_paths.append(filepath)
+
+    return edges_paths
+

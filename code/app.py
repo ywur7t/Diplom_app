@@ -6,17 +6,20 @@ from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
-from process_images import Process_Images, GrayScale_Images, DepthMap_Images
+from process_images import Process_Images, GrayScale_Images, DepthMap_Images, extract_edges
 from Featuring import extract_keypoints_with_depth
 from PointCloud import save_keypoints_as_pointcloud
-from modeling import pointcloud_to_mesh
+from modeling import pointcloud_to_mesh, pointcloud_to_mesh_alpha_shape, Simplification, Cleaning
 import open3d as o3d
+import shutil
+
 
 class Create_Main_Window:
     def __init__(self, root):
         self.root = root
         self.root.title("3D Reconstruction App")
         root.geometry(str(round(root.winfo_screenwidth()/1.28)) + "x" + str(round(root.winfo_screenheight()/1.234))+"+100+50")
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
 
         # Configure grid layout
         self.root.grid_columnconfigure(1, weight=1)
@@ -148,8 +151,10 @@ class Create_Main_Window:
         image_processed_paths = Process_Images(self.image_paths)
         print("Create Image GrayScaling...")
         grayscale_image_paths = GrayScale_Images(image_processed_paths)
+        print("Create Edge Images...")
+        image_edges_paths = extract_edges(grayscale_image_paths)
         print("Create Image Depth Map...")
-        disparity, depthmap_image_path = DepthMap_Images(grayscale_image_paths)
+        disparity, depthmap_image_path = DepthMap_Images(image_edges_paths)
 
 
         print("Starting featuring keypoints...")
@@ -160,7 +165,8 @@ class Create_Main_Window:
         o3d.visualization.draw_geometries([pcd], window_name=f"keypoints length: {len(kp)}", width=800, height=600)
 
         print("Starting create model...")
-        pointcloud_to_mesh("keypoints_cloud.ply")
+        pointcloud_to_mesh_alpha_shape("keypoints_cloud.ply")
+        Simplification("output_mesh_alpha.ply")
 
         print("Show model...")
         self.update_3d_view()
@@ -178,7 +184,7 @@ class Create_Main_Window:
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
 
-    def update_3d_view(self, ply_file="output_mesh.ply"):
+    def update_3d_view(self, ply_file="optimized_mesh.ply"):
         # Clear previous plot
         self.ax.clear()
 
@@ -244,6 +250,15 @@ class Create_Main_Window:
         # Redraw
         # self.canvas.draw()
 
+    def on_close(self):
+        directories_to_clear = ["images\depthMaps", "images\edges", "images\grayscales", "images\processed"]
+
+        for folder in directories_to_clear:
+            if os.path.exists(folder):
+                shutil.rmtree(folder)
+                os.makedirs(folder)
+
+        self.root.destroy()
 
 
 if __name__ == "__main__":

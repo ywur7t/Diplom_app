@@ -14,6 +14,9 @@ images/
 # Игнорировать файлы
 keypoints_cloud.ply
 output_mesh.ply
+light_model.obj
+optimized_mesh.ply
+output_mesh_alpha.ply
 
 # Игнорировать кэш Python
 __pycache__/
